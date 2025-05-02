@@ -69,20 +69,33 @@ def load_data():
         return pd.read_parquet(file_path)
 
 @st.cache_resource
+@st.cache_resource
 def load_model():
     """Load the CatBoost forecasting model"""
+    file_path = "miami311_catboost_model.cbm"
+    
+    # Check if file exists locally
+    if not os.path.exists(file_path):
+        # Your Google Drive file ID - you need to replace this with the actual ID after uploading
+        file_id = "1S8GwHo4Ks3pNMCKiIsNYvA0PCzAddxSo"
+        
+        try:
+            with st.spinner("Downloading model file..."):
+                import gdown
+                url = f"https://drive.google.com/uc?id={file_id}"
+                gdown.download(url, file_path, quiet=False)
+                st.success("Model download completed!")
+        except Exception as e:
+            st.error(f"Error downloading model file: {e}")
+            st.stop()
+    
     try:
         model = catboost.CatBoostRegressor()
-        model.load_model('cat_vol_v1.cbm')
+        model.load_model(file_path)
         return model
-    except:
-        st.error("Model file not found. Please train and save the model first.")
+    except Exception as e:
+        st.error(f"Error loading model: {e}")
         return None
-
-# Load the data and the model
-with st.spinner("Loading data..."):
-    data = load_data()
-    model = load_model()
 
 # Create a function to prepare monthly panel data
 @st.cache_data
