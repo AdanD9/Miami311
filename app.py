@@ -132,8 +132,21 @@ def create_monthly_panel(df):
     
     return panel
 
+with st.spinner("Loading data..."):
+    data = load_data()
+
+# Check if data was loaded successfully
+if data is None:
+    st.error("Failed to load data. Please check the data source and try again.")
+    st.stop()
+
+# Now load the model once we know data is available
+with st.spinner("Loading model..."):
+    model = load_model()
+
 # Create monthly panel data
-monthly_panel = create_monthly_panel(data)
+with st.spinner("Processing data..."):
+    monthly_panel = create_monthly_panel(data)
 
 # Create tabs for the app
 tab1, tab2 = st.tabs(["📊 Dashboard", "🔮 Forecasting"])
