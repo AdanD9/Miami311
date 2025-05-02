@@ -96,9 +96,6 @@ def load_model():
         st.error(f"Error loading model: {e}")
         return None
 
-data  = load_data()
-model = load_model()
-
 # Create a function to prepare monthly panel data
 @st.cache_data
 def create_monthly_panel(df):
@@ -134,21 +131,23 @@ def create_monthly_panel(df):
     
     return panel
 
-with st.spinner("Loading data..."):
-    data = load_data()
+monthly_panel = create_monthly_panel(load_data())   # cached call
+data = monthly_panel.copy()                         # for dashboard plots
+model = load_model()  
 
-# Check if data was loaded successfully
-if data is None:
-    st.error("Failed to load data. Please check the data source and try again.")
+def last_row(panel, z, it):
+    row = (panel[(panel.zip_code==z) & (panel.issue_type==it)]
+                  .sort_values("month")
+                  .tail(1))
+    return row.iloc[0] if not row.empty else None  
+
+latest = last_row(monthly_panel, selected_zip, selected_issue)
+if latest is None:
+    st.error("No historical data …")
     st.stop()
 
-# Now load the model once we know data is available
-with st.spinner("Loading model..."):
-    model = load_model()
-
-# Create monthly panel data
-with st.spinner("Processing data..."):
-    monthly_panel = create_monthly_panel(data)
+input_data = pd.DataFrame([latest])
+input_data["month"] = selected_month                            # CPU-forced CatBoost
 
 # Create tabs for the app
 tab1, tab2 = st.tabs(["📊 Dashboard", "🔮 Forecasting"])
@@ -256,10 +255,10 @@ with tab2:
     
     with col3:
         # Date selector (starting from Jan 2024 for 48 months)
-        start_month = pd.Timestamp('2024-01-01')
-        next_months = [(start_month + pd.DateOffset(months=i)).strftime('%Y-%m') for i in range(49)]  # 0-48 months
-        selected_month_str = st.selectbox('Select Month to Predict', next_months)
-        selected_month = pd.Timestamp(selected_month_str + '-01')
+        start_month = pd.Timestamp("2024-01-01")
+        next_months = [(start_month + pd.DateOffset(months=i)).strftime("%Y-%m") for i in range(13)]
+        selected_month_str = st.selectbox("Select Month to Predict", next_months)
+        selected_month = pd.Timestamp(selected_month_str + "-01")
     
     # Show historical data for the selected combination
     st.subheader('Historical Trend')
