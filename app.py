@@ -89,7 +89,7 @@ def load_model():
             st.stop()
     
     try:
-        model = catboost.CatBoostRegressor()
+        model = catboost.CatBoostRegressor(task_type="CPU", devices="-1")
         model.load_model(file_path)
         return model
     except Exception as e:
