@@ -42,41 +42,31 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-def download_file_from_google_drive(destination):
-    URL = "https://drive.google.com/file/d/1J6XGdlEc2P3xacZmNmlKo5oDWSTvuJl8"
-    
-    with st.spinner(f"Downloading data file (this might take a while)..."):
-        # First request gets the confirmation token for large files
-        session = requests.Session()
-        response = session.get(URL, stream=True)
-        
-        # For large files, Drive shows a confirmation page
-        # Need to parse "confirm" token from the response
-        for key, value in response.cookies.items():
-            if key.startswith('download_warning'):
-                token = value
-                URL = URL + "&confirm=" + token
-                break
-                
-        # Second request with confirmation token if needed
-        response = session.get(URL, stream=True)
-        
-        # Write the file in chunks to handle large files
-        with open(destination, 'wb') as f:
-            for chunk in response.iter_content(chunk_size=32768):
-                if chunk:  # filter out keep-alive chunks
-                    f.write(chunk)
-
 @st.cache_data
 def load_data():
     """Load the cleaned Miami 311 data"""
-    file_path = "https://drive.google.com/file/d/1J6XGdlEc2P3xacZmNmlKo5oDWSTvuJl8"
+    file_path = "miami311_clean.parquet"
     
     # Check if file exists locally
     if not os.path.exists(file_path):
-        download_file_from_google_drive(file_path)
+        # This is your Google Drive file ID - just the ID part from the URL
+        file_id = "1J6XGdlEc2P3xacZmNmlKo5oDWSTvuJl8"
+        
+        try:
+            with st.spinner("Downloading data file (this may take a while)..."):
+                import gdown
+                url = f"https://drive.google.com/uc?id={file_id}"
+                gdown.download(url, file_path, quiet=False)
+                st.success("Download completed!")
+        except Exception as e:
+            st.error(f"Error downloading file: {e}")
+            st.stop()
     
-    return pd.read_parquet(file_path)
+    # Load based on file extension
+    if file_path.endswith('.csv'):
+        return pd.read_csv(file_path)
+    else:
+        return pd.read_parquet(file_path)
 
 @st.cache_resource
 def load_model():
