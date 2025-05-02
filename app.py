@@ -43,7 +43,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 def download_file_from_google_drive(destination):
-    URL = "https://drive.google.com/file/d/1J6XGdlEc2P3xacZmNmlKo5oDWSTvuJl8/view?usp=drive_link"
+    URL = "https://drive.google.com/file/d/1J6XGdlEc2P3xacZmNmlKo5oDWSTvuJl8"
     
     with st.spinner(f"Downloading data file (this might take a while)..."):
         # First request gets the confirmation token for large files
@@ -70,7 +70,7 @@ def download_file_from_google_drive(destination):
 @st.cache_data
 def load_data():
     """Load the cleaned Miami 311 data"""
-    file_path = "https://drive.google.com/file/d/1J6XGdlEc2P3xacZmNmlKo5oDWSTvuJl8/view?usp=drive_link"
+    file_path = "https://drive.google.com/file/d/1J6XGdlEc2P3xacZmNmlKo5oDWSTvuJl8"
     
     # Check if file exists locally
     if not os.path.exists(file_path):
