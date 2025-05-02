@@ -141,14 +141,6 @@ def last_row(panel, z, it):
                   .tail(1))
     return row.iloc[0] if not row.empty else None  
 
-latest = last_row(monthly_panel, selected_zip, selected_issue)
-if latest is None:
-    st.error("No historical data …")
-    st.stop()
-
-input_data = pd.DataFrame([latest])
-input_data["month"] = selected_month                            # CPU-forced CatBoost
-
 # Create tabs for the app
 tab1, tab2 = st.tabs(["📊 Dashboard", "🔮 Forecasting"])
 
@@ -365,3 +357,11 @@ with tab2:
             """)
         else:
             st.error("Cannot make prediction: No historical data available for this combination.") 
+
+latest = last_row(monthly_panel, selected_zip, selected_issue)
+if latest is None:
+    st.error("No historical data …")
+    st.stop()
+
+input_data = pd.DataFrame([latest])
+input_data["month"] = selected_month    
