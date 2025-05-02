@@ -42,8 +42,8 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-def download_file_from_google_drive(file_id, destination):
-    URL = "https://drive.google.com/file/d/1J6XGdlEc2P3xacZmNmlKo5oDWSTvuJl8/view?usp=drive_link" + file_id
+def download_file_from_google_drive(destination):
+    URL = "https://drive.google.com/file/d/1J6XGdlEc2P3xacZmNmlKo5oDWSTvuJl8/view?usp=drive_link"
     
     with st.spinner(f"Downloading data file (this might take a while)..."):
         # First request gets the confirmation token for large files
@@ -70,13 +70,11 @@ def download_file_from_google_drive(file_id, destination):
 @st.cache_data
 def load_data():
     """Load the cleaned Miami 311 data"""
-    file_path = "miami311_clean.parquet"
+    file_path = "https://drive.google.com/file/d/1J6XGdlEc2P3xacZmNmlKo5oDWSTvuJl8/view?usp=drive_link"
     
     # Check if file exists locally
     if not os.path.exists(file_path):
-        # Replace FILE_ID with your Google Drive file ID
-        file_id = "YOUR_GOOGLE_DRIVE_FILE_ID" 
-        download_file_from_google_drive(file_id, file_path)
+        download_file_from_google_drive(file_path)
     
     return pd.read_parquet(file_path)
 
