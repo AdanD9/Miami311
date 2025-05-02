@@ -96,6 +96,9 @@ def load_model():
         st.error(f"Error loading model: {e}")
         return None
 
+data  = load_data()
+model = load_model()
+
 # Create a function to prepare monthly panel data
 @st.cache_data
 def create_monthly_panel(df):
