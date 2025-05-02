@@ -131,9 +131,13 @@ def create_monthly_panel(df):
     
     return panel
 
-monthly_panel = create_monthly_panel(load_data())   # cached call
-data = monthly_panel.copy()                         # for dashboard plots
+monthly_panel = create_monthly_panel(load_data())
+data = monthly_panel.copy()
 model = load_model()  
+
+raw_df = load_data()
+monthly_panel = create_monthly_panel(raw_df)
+data = raw_df
 
 def last_row(panel, z, it):
     row = (panel[(panel.zip_code==z) & (panel.issue_type==it)]
@@ -357,11 +361,3 @@ with tab2:
             """)
         else:
             st.error("Cannot make prediction: No historical data available for this combination.") 
-
-latest = last_row(monthly_panel, selected_zip, selected_issue)
-if latest is None:
-    st.error("No historical data …")
-    st.stop()
-
-input_data = pd.DataFrame([latest])
-input_data["month"] = selected_month    
