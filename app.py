@@ -69,7 +69,6 @@ def load_data():
         return pd.read_parquet(file_path)
 
 @st.cache_resource
-@st.cache_resource
 def load_model():
     """Load the CatBoost forecasting model"""
     file_path = "miami311_catboost_model.cbm"
